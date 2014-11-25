@@ -1,0 +1,10 @@
+---
+layout: docs
+title: Note
+permalink: /note/
+author: all
+---
+
+{% for post in site.categories."note" %}
+  {% include post_title_excerpt.html %}
+{% endfor %}
