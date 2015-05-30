@@ -1,8 +1,8 @@
 ---
 layout: docs
-category : note
-tagline: "powershell"
-tags : [powershell, code, notes,test]
+category : code
+tagline: "cpp"
+tags : [PE, export, table,RVA,offset]
 ---
 
 1.`powershell`执行脚本：
