@@ -4,8 +4,10 @@ category : code
 tagline: "cpp"
 tags : [PE, export, table,RVA,offset]
 ---
+本文主要介绍如何通过PE文件结构，得到导出函数的相对虚拟地址和文件偏移，包括相对虚拟地址和文件偏移的转换、PE文件结构、导出表结构等。
 
 1.PE文件结构
+
 PE前面的内容：
 DOS头、NT头、节表
 节表紧跟在NT头后面，NT头有个字段表名节表的个数。他们的关系如下：
@@ -16,9 +18,13 @@ PIMAGE_SECTION_HEADER pSectionHeader =(PIMAGE_SECTION_HEADER) ((ULONG)pNTHeader 
 {% endhighlight %}
 
 2.相对虚拟地址（RVA）和文件偏移(Offset)
+
 RVA：当PE文件加载到内存后（如通过PE加载器加载到内存中），相对内存基址BaseAddr的偏移
+
 Offset:相对PE文件头部的偏移
+
 在PE文件结构中，很多地址记录的都是RVA，如果要对应到文件偏移，需要进行转换。转换的方法如下：
+
 首先定位到RVA处于哪个节中，然后计算出文件偏移。
 每个节包含RVA、文件偏移、大小等信息，通过遍历，可以知道RVA处于哪个节，接着使用如下方法即可得到Offset:
 {% highlight bash %}
@@ -54,12 +60,15 @@ LPVOID RVAToOffset(LPVOID BaseAddr,LPVOID RVA)
 
 
 3.导出表（Export Table)
+
 NT头部的OptionHead部分的DataDirectory数组，存放各个导出、导入等表的RVA和大小，导出表RVA获取方法如下：
 {% highlight cpp %}
 LPVOID pExport_RVA = (LPVOID)(pOptionHead->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
 {% endhighlight %}
 导出表中包含着AddressOfFunctions、AddressOfNames、AddressOfNameOrdinals（均是RVA），均要注意的是：
+
 得到AddressOfFunctions、AddressOfNames均是地址数组，他们中存放的地址也是RVA。
+
 因此，通过导出表，得到函数名、RVA、文件偏移地址代码如下：
 {% highlight cpp %}
 	PIMAGE_EXPORT_DIRECTORY pExport = (PIMAGE_EXPORT_DIRECTORY)((ULONG)pExport_Offset + (ULONG)BaseAddr);
@@ -85,6 +94,7 @@ LPVOID pExport_RVA = (LPVOID)(pOptionHead->DataDirectory[IMAGE_DIRECTORY_ENTRY_E
 
 
 4.通过PE文件，获得导出表函数RVA、Offset、函数名完整代码如下：
+
 {% highlight cpp %}
 void GetExportFuncAddr(TCHAR* filename)
 {
